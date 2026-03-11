@@ -38,6 +38,9 @@
 #define CONFIG_BAT_UPPER_RES    100.0
 #define CONFIG_BAT_LOWER_RES    100.0
 
+
+
+
 #define LAMP_GPIO               GPIO_NUM_NC
 
 #endif // _BOARD_CONFIG_H_ 
