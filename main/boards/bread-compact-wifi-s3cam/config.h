@@ -302,7 +302,12 @@
 #endif
 
 
-// A MCP Test: Control a lamp
-#define LAMP_GPIO GPIO_NUM_14
+// Impostazioni Batteria per Pin 14 (ADC1 Channel 3)
+#define CONFIG_BAT_ADC_CHAN     ADC_CHANNEL_3
+#define CONFIG_BAT_ADC_UNIT     ADC_UNIT_1
+#define CONFIG_BAT_UPPER_RES    100.0
+#define CONFIG_BAT_LOWER_RES    100.0
 
+// Disabilita la lampada sul Pin 14 per liberarlo
+#define LAMP_GPIO               GPIO_NUM_NC
 #endif // _BOARD_CONFIG_H_
