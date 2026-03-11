@@ -3,14 +3,14 @@
 
 #include <driver/gpio.h>
 
-#define AUDIO_I2S_BCK_PIN GPIO_NUM_7
-#define AUDIO_I2S_WS_PIN  GPIO_NUM_15
-#define AUDIO_I2S_DATA_OUT_PIN GPIO_NUM_16
-#define AUDIO_I2S_DATA_IN_PIN  GPIO_NUM_38
+#define AUDIO_I2S_BCK_PIN           GPIO_NUM_7
+#define AUDIO_I2S_WS_PIN            GPIO_NUM_15
+#define AUDIO_I2S_DATA_OUT_PIN      GPIO_NUM_16
+#define AUDIO_I2S_DATA_IN_PIN       GPIO_NUM_38
 
-#define LCD_SDA_PIN GPIO_NUM_41
-#define LCD_SCL_PIN GPIO_NUM_42
+#define LCD_SDA_PIN                 GPIO_NUM_41
+#define LCD_SCL_PIN                 GPIO_NUM_42
 
-#define BATTERY_ADC_PIN GPIO_NUM_14
+#define BATTERY_ADC_PIN             GPIO_NUM_14
 
 #endif
