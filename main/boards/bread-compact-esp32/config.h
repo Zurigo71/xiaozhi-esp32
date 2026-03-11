@@ -40,4 +40,4 @@
 
 #define LAMP_GPIO               GPIO_NUM_NC
 
-#endif // _BOARD_CONFIG_H_
+#endif // _BOARD_CONFIG_H_ 
