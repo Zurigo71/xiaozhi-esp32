@@ -670,74 +670,57 @@ config USE_MULTILINE_CHAT_MESSAGE
 
 choice WAKE_WORD_TYPE
     prompt "Wake Word Implementation Type"
-    default USE_AFE_WAKE_WORD if (IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32P4) && SPIRAM
+    # Impostato su CUSTOM per abilitare la tua parola personalizzata
+    default USE_CUSTOM_WAKE_WORD if (IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32P4) && SPIRAM
     default WAKE_WORD_DISABLED
     help
         Choose the type of wake word implementation to use
 
     config WAKE_WORD_DISABLED
         bool "Disabled"
-        help
-            Disable wake word detection
 
     config USE_ESP_WAKE_WORD
         bool "Wakenet model without AFE"
         depends on IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || (IDF_TARGET_ESP32 && SPIRAM)
-        help
-            Support ESP32 C3、ESP32 C5 与 ESP32 C6, and (ESP32 with PSRAM)
 
     config USE_AFE_WAKE_WORD
         bool "Wakenet model with AFE"
         depends on (IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32P4) && SPIRAM
-        help
-            Support AEC if available, requires ESP32 S3 and PSRAM
 
     config USE_CUSTOM_WAKE_WORD
         bool "Multinet model (Custom Wake Word)"
         depends on (IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32P4) && SPIRAM
-        help
-            Requires ESP32 S3 and PSRAM
-
 endchoice
 
 config CUSTOM_WAKE_WORD
     string "Custom Wake Word"
-    default "xiao tu dou"
+    # MODIFICATO: Inserita la tua parola chiave
+    default "ciao atlas"
     depends on USE_CUSTOM_WAKE_WORD
-    help
-        Custom Wake Word, use pinyin for Chinese, separated by spaces
 
 config CUSTOM_WAKE_WORD_DISPLAY
     string "Custom Wake Word Display"
-    default "小土豆"
+    # MODIFICATO: Testo che appare sul display al risveglio
+    default "Ciao Atlas!"
     depends on USE_CUSTOM_WAKE_WORD
-    help
-        Greeting sent to the server after wake word detection
 
 config CUSTOM_WAKE_WORD_THRESHOLD
     int "Custom Wake Word Threshold (%)"
-    default 20
+    # MODIFICATO: Abbassato a 15 per rendere il risveglio più pronto
+    default 15
     range 1 99
     depends on USE_CUSTOM_WAKE_WORD
-    help
-        Custom Wake Word Threshold, range 1-99, the smaller the more sensitive, default 20
 
 config SEND_WAKE_WORD_DATA
     bool "Send Wake Word Data"
     default y
     depends on USE_AFE_WAKE_WORD || USE_CUSTOM_WAKE_WORD
-    help
-        Send wake word data to the server as the first message of the conversation and wait for response
 
 config WAKE_WORD_DETECTION_IN_LISTENING
     bool "Enable Wake Word Detection in Listening Mode"
-    default n
+    # MODIFICATO: Impostato su 'y' per permetterti di interromperlo mentre parla
+    default y
     depends on USE_AFE_WAKE_WORD || USE_CUSTOM_WAKE_WORD
-    help
-        Enable wake word detection while in listening mode.
-        When enabled, the device can detect wake word during listening,
-        which allows interrupting the current conversation.
-        When disabled (default), wake word detection is turned off during listening.
 
 config USE_AUDIO_PROCESSOR
     bool "Enable Audio Noise Reduction"
