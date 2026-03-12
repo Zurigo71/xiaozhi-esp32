@@ -62,8 +62,10 @@ struct HardwareConfig {
     gpio_num_t i2c_scl_pin;
 };
 
+// --- CONFIGURAZIONE VERSIONE CON CAMERA ---
 constexpr HardwareConfig CAMERA_VERSION_CONFIG = {
     .power_charge_detect_pin = GPIO_NUM_NC,
+    // MODIFICATO: Spostato su ADC1 Channel 1 (GPIO 2) per compatibilità WiFi
     .power_adc_unit = ADC_UNIT_1,
     .power_adc_channel = ADC_CHANNEL_1,
 
@@ -101,10 +103,12 @@ constexpr HardwareConfig CAMERA_VERSION_CONFIG = {
     .i2c_scl_pin = GPIO_NUM_16,
 };
 
+// --- CONFIGURAZIONE VERSIONE SENZA CAMERA ---
 constexpr HardwareConfig NON_CAMERA_VERSION_CONFIG = {
     .power_charge_detect_pin = GPIO_NUM_21,
-    .power_adc_unit = ADC_UNIT_2,
-    .power_adc_channel = ADC_CHANNEL_3,
+    // MODIFICATO: Spostato su ADC1 Channel 1 (GPIO 2) per compatibilità WiFi
+    .power_adc_unit = ADC_UNIT_1,
+    .power_adc_channel = ADC_CHANNEL_1,
 
     .right_leg_pin = GPIO_NUM_39,
     .right_foot_pin = GPIO_NUM_38,
