@@ -8,15 +8,14 @@
 
 class PowerManager {
 private:
-    // MODIFICA 1: Soglie calibrate per partitore 100k/100k su Pin 14
-    // Abbassiamo i valori perché il Wi-Fi attivo tende a interferire con ADC2
+    // SOGLIE CALIBRATE PER PIN 2 (GPIO 2)
+    // Con partitore 100k/100k: 1700 (~3.4V scarica) - 2200 (~4.2V carica)
     static constexpr struct {
         uint16_t adc;
         uint8_t level;
-    } BATTERY_LEVELS[] = {{1600, 0}, {2100, 100}}; 
+    } BATTERY_LEVELS[] = {{1700, 0}, {2200, 100}}; 
     
     static constexpr size_t BATTERY_LEVELS_COUNT = 2;
-    // MODIFICA 2: Aumentato il campionamento (da 10 a 20) per stabilizzare la lettura
     static constexpr size_t ADC_VALUES_COUNT = 20;
 
     esp_timer_handle_t timer_handle_ = nullptr;
@@ -48,7 +47,6 @@ private:
 
     void ReadBatteryAdcData() {
         int adc_value;
-        // Se la lettura fallisce a causa del Wi-Fi, il sistema non crasha ma logga l'errore
         esp_err_t ret = adc_oneshot_read(adc_handle_, adc_channel_, &adc_value);
         if (ret != ESP_OK) {
             return;
@@ -82,9 +80,9 @@ private:
     }
 
 public:
-    // MODIFICA 3: Forziamo l'uso di ADC_UNIT_2 e ADC_CHANNEL_3 (che è il GPIO 14)
-    PowerManager(gpio_num_t charging_pin, adc_unit_t adc_unit = ADC_UNIT_2,
-                 adc_channel_t adc_channel = ADC_CHANNEL_3)
+    // CONFIGURAZIONE PER PIN 2 (ADC1 Channel 1)
+    PowerManager(gpio_num_t charging_pin, adc_unit_t adc_unit = ADC_UNIT_1,
+                 adc_channel_t adc_channel = ADC_CHANNEL_1)
         : charging_pin_(charging_pin), adc_unit_(adc_unit), adc_channel_(adc_channel) {
 
       if (charging_pin_ != GPIO_NUM_NC) {
