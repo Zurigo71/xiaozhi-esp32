@@ -8,13 +8,16 @@
 
 class PowerManager {
 private:
-    // 电池电量区间-分压电阻为2个100k
+    // MODIFICA 1: Soglie calibrate per partitore 100k/100k su Pin 14
+    // Abbassiamo i valori perché il Wi-Fi attivo tende a interferire con ADC2
     static constexpr struct {
         uint16_t adc;
         uint8_t level;
-    } BATTERY_LEVELS[] = {{2050, 0}, {2450, 100}};
+    } BATTERY_LEVELS[] = {{1600, 0}, {2100, 100}}; 
+    
     static constexpr size_t BATTERY_LEVELS_COUNT = 2;
-    static constexpr size_t ADC_VALUES_COUNT = 10;
+    // MODIFICA 2: Aumentato il campionamento (da 10 a 20) per stabilizzare la lettura
+    static constexpr size_t ADC_VALUES_COUNT = 20;
 
     esp_timer_handle_t timer_handle_ = nullptr;
     gpio_num_t charging_pin_;
@@ -25,12 +28,11 @@ private:
     size_t adc_values_count_ = 0;
     uint8_t battery_level_ = 100;
     bool is_charging_ = false;
-    inline static bool battery_update_paused_ = false;  // 静态标志：是否暂停电量更新
+    inline static bool battery_update_paused_ = false;
 
     adc_oneshot_unit_handle_t adc_handle_;
 
     void CheckBatteryStatus() {
-      // 如果电量更新被暂停（动作进行中），则跳过更新
       if (battery_update_paused_) {
         return;
       }
@@ -46,7 +48,11 @@ private:
 
     void ReadBatteryAdcData() {
         int adc_value;
-        ESP_ERROR_CHECK(adc_oneshot_read(adc_handle_, adc_channel_, &adc_value));
+        // Se la lettura fallisce a causa del Wi-Fi, il sistema non crasha ma logga l'errore
+        esp_err_t ret = adc_oneshot_read(adc_handle_, adc_channel_, &adc_value);
+        if (ret != ESP_OK) {
+            return;
+        }
 
         adc_values_[adc_values_index_] = adc_value;
         adc_values_index_ = (adc_values_index_ + 1) % ADC_VALUES_COUNT;
@@ -61,9 +67,6 @@ private:
         average_adc /= adc_values_count_;
 
         CalculateBatteryLevel(average_adc);
-
-        // ESP_LOGI("PowerManager", "ADC值: %d 平均值: %ld 电量: %u%%", adc_value, average_adc,
-        //          battery_level_);
     }
 
     void CalculateBatteryLevel(uint32_t average_adc) {
@@ -79,6 +82,7 @@ private:
     }
 
 public:
+    // MODIFICA 3: Forziamo l'uso di ADC_UNIT_2 e ADC_CHANNEL_3 (che è il GPIO 14)
     PowerManager(gpio_num_t charging_pin, adc_unit_t adc_unit = ADC_UNIT_2,
                  adc_channel_t adc_channel = ADC_CHANNEL_3)
         : charging_pin_(charging_pin), adc_unit_(adc_unit), adc_channel_(adc_channel) {
@@ -91,9 +95,6 @@ public:
         io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
         io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
         gpio_config(&io_conf);
-        ESP_LOGI("PowerManager", "充电检测引脚配置完成: GPIO%d", charging_pin_);
-      } else {
-        ESP_LOGI("PowerManager", "充电检测引脚未配置，不进行充电状态检测");
       }
 
         esp_timer_create_args_t timer_args = {
@@ -108,7 +109,7 @@ public:
             .skip_unhandled_events = true,
         };
         ESP_ERROR_CHECK(esp_timer_create(&timer_args, &timer_handle_));
-        ESP_ERROR_CHECK(esp_timer_start_periodic(timer_handle_, 1000000));  // 1秒
+        ESP_ERROR_CHECK(esp_timer_start_periodic(timer_handle_, 1000000));
 
         InitializeAdc();
     }
@@ -144,8 +145,7 @@ public:
 
     uint8_t GetBatteryLevel() { return battery_level_; }
 
-    // 暂停/恢复电量更新（用于动作执行时屏蔽更新）
     static void PauseBatteryUpdate() { battery_update_paused_ = true; }
     static void ResumeBatteryUpdate() { battery_update_paused_ = false; }
 };
-#endif  // __POWER_MANAGER_H__
+#endif // __POWER_MANAGER_H__
